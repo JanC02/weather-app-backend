@@ -1,25 +1,24 @@
 import express from 'express';
 import 'dotenv/config';
-
 import { removeDiacritics } from '../helpers/removeDiacritics.js';
 
 const router = express.Router();
 
-router.get('/weather', async (req, res) => {
-    const cityQ = req.query.city;
+router.get('/autocomplete', async (req, res) => {
+    const query = req.query.q;
 
-    if (!cityQ) {
-        return res.status(400).json({ message: 'City parameter is required.' });
+    if (!query) {
+        return res.status(400).json({ message: 'q query is required.' });
     }
 
-    const city = removeDiacritics(cityQ as string);
+    // const parsedQuery = removeDiacritics(query as string);
 
     try {
-        const response = await fetch(`http://api.weatherapi.com/v1/current.json?key=${process.env.API_KEY}&q=${city}&lang=pl`);
-
-        if (response.ok) {
+        const response = await fetch(`http://api.weatherapi.com/v1/search.json?key=${process.env.API_KEY}&q=${query}`);
+        
+        if(response.ok) {
             const data = await response.json();
-            res.status(200).send(data);
+            res.status(200).json(data);
         } else {
             res.status(response.status).json({ message: response.statusText });
         }

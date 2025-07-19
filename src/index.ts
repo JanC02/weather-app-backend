@@ -2,7 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 
-import weather from './routes/weather.js';
+import current from './routes/current.js';
+import autocomplete from './routes/autocomplete.js';
  
 const PORT = process.env.PORT;
 
@@ -14,7 +15,8 @@ app.use(express.json());
 
 // routes
 
-app.use('/api', weather);
+app.use('/api/weather', current);
+app.use('/api/weather', autocomplete);
 
 app.listen(PORT, () => {
     console.log(`App listening on port: ${PORT}`);
