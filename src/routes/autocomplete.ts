@@ -1,6 +1,8 @@
 import express from 'express';
 import 'dotenv/config';
-import { removeDiacritics } from '../helpers/removeDiacritics.js';
+// import { removeDiacritics } from '../helpers/removeDiacritics.js';
+
+const MAX_COUNT = 20;
 
 const router = express.Router();
 
@@ -12,9 +14,10 @@ router.get('/autocomplete', async (req, res) => {
     }
 
     // const parsedQuery = removeDiacritics(query as string);
+    const parsedQuery = (query as string).trim();
 
     try {
-        const response = await fetch(`http://api.weatherapi.com/v1/search.json?key=${process.env.API_KEY}&q=${query}`);
+        const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${parsedQuery}&count=${MAX_COUNT}&language=en&format=json`);
         
         if(response.ok) {
             const data = await response.json();
