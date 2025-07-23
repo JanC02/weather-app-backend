@@ -1,6 +1,6 @@
-# Weather API Proxy 🌦️
+# Weather Data Server 🌦️
 
-A simple proxy server written in Node.js and Express, designed to securely handle requests to the [WeatherAPI](https://www.weatherapi.com/). This application hides the API key from the client-side (frontend), enhancing security.
+A simple server written in Node.js and Express, designed to act as a proxy and caching layer for a weather application. This server hides and caches requests to the free and open-source [Open-Meteo API](https://open-meteo.com/) to improve performance and reliability.
 
 ***
 
@@ -26,13 +26,10 @@ A simple proxy server written in Node.js and Express, designed to securely handl
     ```
 
 3.  **Create a `.env` file:**
-    Copy the `.env.example` file (if it exists) or create a new `.env` file in the root directory and add the required variables:
+    Copy the `.env.example` file (if it exists) or create a new `.env` file in the root directory and add the required port variable:
     ```env
     # The port the server will run on
     PORT=5000
-
-    # Your private API key
-    WEATHER_API_KEY=your_api_key_here
     ```
 
 4.  **Run the server:**
@@ -48,16 +45,25 @@ A simple proxy server written in Node.js and Express, designed to securely handl
 
 ***
 
-## API Endpoint
+## API Endpoints
 
-The server provides a single endpoint to fetch weather data.
+The server provides endpoints to fetch weather and location data.
 
-### `GET /api/weather`
+### `GET /api/weather/current`
 
-Fetches the current weather data for a given location.
+Fetches the current weather data for a given location using geographic coordinates.
 
-* **Query Parameter:** `city` (string, required)
-* **Example:** `http://localhost:5000/api/weather?city=London`
+* **Query Parameters:**
+    * `lat` (number, required) - The latitude of the location.
+    * `lon` (number, required) - The longitude of the location.
+* **Example:** `http://localhost:5000/api/weather/current?lat=49.90717273632199&lon=21.048124934340873`
+
+### `GET /api/weather/autocomplete`
+
+Provides a list of city suggestions based on the user's query, using geocoding.
+
+* **Query Parameter:** `q` (string, required)
+* **Example:** `http://localhost:5000/api/weather/autocomplete?q=Tuch`
 
 ***
 

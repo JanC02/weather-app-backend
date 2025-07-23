@@ -6,16 +6,22 @@ import { removeDiacritics } from '../helpers/removeDiacritics.js';
 const router = express.Router();
 
 router.get('/current', async (req, res) => {
-    const cityQ = req.query.city;
+    const lat = req.query.lat;
+    const lon = req.query.lon;
 
-    if (!cityQ) {
-        return res.status(400).json({ message: 'City parameter is required.' });
+    if (!lat) {
+        return res.status(400).json({ message: 'Latitude parameter is required.' });
     }
 
-    const city = removeDiacritics(cityQ as string);
+    if (!lon) {
+        return res.status(400).json({ message: 'Longitude parameter is required.' });
+    }
+
+    const latitude = (lat as string).trim();
+    const longitude = (lon as string).trim();
 
     try {
-        const response = await fetch(`http://api.weatherapi.com/v1/current.json?key=${process.env.API_KEY}&q=${city}&lang=pl`);
+        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FBerlin`);
 
         if (response.ok) {
             const data = await response.json();
