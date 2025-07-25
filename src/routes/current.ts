@@ -1,8 +1,6 @@
 import express from 'express';
 import 'dotenv/config';
 
-import { removeDiacritics } from '../helpers/removeDiacritics.js';
-
 const router = express.Router();
 
 router.get('/current', async (req, res) => {
