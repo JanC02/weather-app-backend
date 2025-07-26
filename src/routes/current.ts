@@ -15,8 +15,12 @@ router.get('/current', async (req, res) => {
         return res.status(400).json({ message: 'Longitude parameter is required.' });
     }
 
-    const latitude = (lat as string).trim();
-    const longitude = (lon as string).trim();
+    if (typeof lat !== 'string' || typeof lon !== 'string') {
+        return res.status(400).json({ message: 'Latitude and longitude must be strings.' });
+    }
+
+    const latitude = lat.trim();
+    const longitude = lon.trim();
 
     try {
         const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FBerlin&current=temperature_2m,weather_code`);
