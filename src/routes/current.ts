@@ -23,7 +23,7 @@ router.get('/current', async (req, res) => {
     const longitude = lon.trim();
 
     try {
-        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FBerlin&current=temperature_2m,weather_code`);
+        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FBerlin&current=temperature_2m,weather_code,pressure_msl`);
 
         if (response.ok) {
             const data = await response.json();
