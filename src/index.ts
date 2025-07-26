@@ -7,6 +7,11 @@ import autocomplete from './routes/autocomplete.js';
  
 const PORT = process.env.PORT;
 
+if (!PORT) {
+    console.error('FATAL ERROR: PORT is not defined.');
+    process.exit(1);
+}
+
 const app = express();
 
 // middleware
