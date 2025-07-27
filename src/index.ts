@@ -1,11 +1,10 @@
 import express from 'express';
 import cors from 'cors';
-import 'dotenv/config';
-
+import { config } from "./config.js";
 import current from './routes/current.js';
 import autocomplete from './routes/autocomplete.js';
  
-const PORT = process.env.PORT;
+const PORT = config.port;
 
 if (!PORT) {
     console.error('FATAL ERROR: PORT is not defined.');
@@ -19,7 +18,6 @@ app.use(cors());
 app.use(express.json());
 
 // routes
-
 app.use('/api/weather', current);
 app.use('/api/weather', autocomplete);
 

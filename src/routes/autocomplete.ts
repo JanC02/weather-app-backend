@@ -3,6 +3,12 @@ import { config } from "../config.js";
 
 const RESULTS_MAX_COUNT = config.autocomplete.maxResults;
 const RESPONSE_LANG = config.autocomplete.responseLanguage;
+const AUTOCOMPLETE_URL = config.autocomplete.geocodingUrl;
+
+if (!AUTOCOMPLETE_URL) {
+    console.error('FATAL ERROR: AUTOCOMPLETE_URL is not defined.');
+    process.exit(1);
+}
 
 const router = express.Router();
 
@@ -13,11 +19,15 @@ router.get('/autocomplete', async (req, res) => {
         return res.status(400).json({ message: 'q query is required.' });
     }
 
+    if (typeof query !== 'string') {
+        return res.status(400).json({ message: 'q must be a string.' });
+    }
+
     // Open-Meteo handles easily requests with diacritics
-    const parsedQuery = (query as string).trim();
+    const parsedQuery = query.trim();
 
     try {
-        const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${parsedQuery}&count=${RESULTS_MAX_COUNT}&language=${RESPONSE_LANG}&format=json`);
+        const response = await fetch(`${AUTOCOMPLETE_URL}?name=${parsedQuery}&count=${RESULTS_MAX_COUNT}&language=${RESPONSE_LANG}&format=json`);
         
         if(response.ok) {
             const data = await response.json();
