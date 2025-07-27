@@ -1,5 +1,12 @@
 import express from 'express';
-import 'dotenv/config';
+import { config } from "../config.js";
+
+const WEATHER_URL = config.weatherData.weatherUrl;
+
+if (!WEATHER_URL) {
+    console.error('FATAL ERROR: WEATHER_URL is not defined.');
+    process.exit(1);
+}
 
 const router = express.Router();
 
@@ -23,7 +30,7 @@ router.get('/current', async (req, res) => {
     const longitude = lon.trim();
 
     try {
-        const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FBerlin&current=temperature_2m,weather_code,pressure_msl`);
+        const response = await fetch(`${WEATHER_URL}?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min&timezone=Europe%2FBerlin&current=temperature_2m,weather_code,pressure_msl`);
 
         if (response.ok) {
             const data = await response.json();
