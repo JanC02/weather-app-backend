@@ -19,8 +19,12 @@ router.get('/autocomplete', async (req, res) => {
         return res.status(400).json({ message: 'q query is required.' });
     }
 
+    if (typeof query !== 'string') {
+        return res.status(400).json({ message: 'q must be a string.' });
+    }
+
     // Open-Meteo handles easily requests with diacritics
-    const parsedQuery = (query as string).trim();
+    const parsedQuery = query.trim();
 
     try {
         const response = await fetch(`${AUTOCOMPLETE_URL}?name=${parsedQuery}&count=${RESULTS_MAX_COUNT}&language=${RESPONSE_LANG}&format=json`);
