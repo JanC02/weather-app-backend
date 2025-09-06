@@ -1,15 +1,12 @@
 import express from 'express';
 import { config } from '../config.js';
 import { AutocompleteSchema } from '../types.js';
-import NodeCache from 'node-cache';
 import { removeDiacritics } from '../helpers/removeDiacritics.js';
+import cache from '../cache.js';
 
 const RESULTS_MAX_COUNT = config.autocomplete.maxResults;
 const RESPONSE_LANG = config.autocomplete.responseLanguage;
 const AUTOCOMPLETE_URL = config.autocomplete.geocodingUrl;
-
-// 24h
-const cache = new NodeCache({ stdTTL: 86400 });
 
 if (!AUTOCOMPLETE_URL) {
     console.error('FATAL ERROR: AUTOCOMPLETE_URL is not defined.');
@@ -40,7 +37,8 @@ router.get('/autocomplete', async (req, res) => {
 
         if(response.ok) {
             const data = await response.json();
-            cache.set(cacheKey, data);
+            // 24h
+            cache.set(cacheKey, data, 86400);
 
             res.status(200).json(data);
         } else {

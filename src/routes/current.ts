@@ -1,7 +1,7 @@
 import express from 'express';
 import { config } from "../config.js";
 import { CurrentSchema } from '../types.js';
-import NodeCache from 'node-cache';
+import cache from '../cache.js';
 
 const WEATHER_URL = config.weatherData.weatherUrl;
 
@@ -11,9 +11,6 @@ if (!WEATHER_URL) {
 }
 
 const router = express.Router();
-
-// 15 min
-const cache = new NodeCache({ stdTTL: 900 });
 
 router.get('/current', async (req, res) => {
     const result = CurrentSchema.safeParse(req.query);
@@ -37,7 +34,8 @@ router.get('/current', async (req, res) => {
 
         if (response.ok) {
             const data = await response.json();
-            cache.set(cacheKey, data);
+            // 15 min
+            cache.set(cacheKey, data, 900);
 
             res.status(200).send(data);
         } else {
