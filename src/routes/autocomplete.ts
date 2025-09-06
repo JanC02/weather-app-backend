@@ -1,6 +1,8 @@
 import express from 'express';
 import { config } from '../config.js';
 import { AutocompleteSchema } from '../types.js';
+import { removeDiacritics } from '../helpers/removeDiacritics.js';
+import cache from '../cache.js';
 
 const RESULTS_MAX_COUNT = config.autocomplete.maxResults;
 const RESPONSE_LANG = config.autocomplete.responseLanguage;
@@ -22,11 +24,22 @@ router.get('/autocomplete', async (req, res) => {
 
     const parsedQuery = result.data.q;
 
+    const normalizedQuery = removeDiacritics(parsedQuery);
+    const cacheKey = `autocomplete-${normalizedQuery}`;
+
     try {
+        const cachedData = cache.get(cacheKey);
+        if (cachedData) {
+            return res.status(200).json(cachedData);
+        }
+
         const response = await fetch(`${AUTOCOMPLETE_URL}?name=${parsedQuery}&count=${RESULTS_MAX_COUNT}&language=${RESPONSE_LANG}&format=json`);
 
         if(response.ok) {
             const data = await response.json();
+            // 24h
+            cache.set(cacheKey, data, 86400);
+
             res.status(200).json(data);
         } else {
             res.status(response.status).json({ message: response.statusText });
