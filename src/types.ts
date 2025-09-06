@@ -6,3 +6,8 @@ export const AutocompleteSchema = z.object({
         z.string().min(1, { message: 'q is too short' })
     )
 });
+
+export const CurrentSchema = z.object({
+    lat: z.coerce.number().min(-90, 'Invalid latitude').max(90, 'Invalid latitude'),
+    lon: z.coerce.number().min(-180, 'Invalid longitude').max(180, 'Invalid longitude'),
+});
