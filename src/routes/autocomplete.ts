@@ -1,7 +1,6 @@
 import express from 'express';
 import { config } from '../config.js';
 import { AutocompleteSchema } from '../types.js';
-import { ZodError } from 'zod';
 
 const RESULTS_MAX_COUNT = config.autocomplete.maxResults;
 const RESPONSE_LANG = config.autocomplete.responseLanguage;
