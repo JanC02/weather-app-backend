@@ -1,5 +1,7 @@
 import express from 'express';
-import { config } from "../config.js";
+import { config } from '../config.js';
+import { AutocompleteSchema } from '../types.js';
+import { ZodError } from 'zod';
 
 const RESULTS_MAX_COUNT = config.autocomplete.maxResults;
 const RESPONSE_LANG = config.autocomplete.responseLanguage;
@@ -13,29 +15,24 @@ if (!AUTOCOMPLETE_URL) {
 const router = express.Router();
 
 router.get('/autocomplete', async (req, res) => {
-    const query = req.query.q;
+    const result = AutocompleteSchema.safeParse(req.query);
 
-    if (!query) {
-        return res.status(400).json({ message: 'q query is required.' });
+    if (!result.success) {
+        return res.status(400).json({ errors: result.error.flatten().fieldErrors });
     }
 
-    if (typeof query !== 'string') {
-        return res.status(400).json({ message: 'q must be a string.' });
-    }
-
-    // Open-Meteo handles easily requests with diacritics
-    const parsedQuery = query.trim();
+    const parsedQuery = result.data.q;
 
     try {
         const response = await fetch(`${AUTOCOMPLETE_URL}?name=${parsedQuery}&count=${RESULTS_MAX_COUNT}&language=${RESPONSE_LANG}&format=json`);
-        
+
         if(response.ok) {
             const data = await response.json();
             res.status(200).json(data);
         } else {
             res.status(response.status).json({ message: response.statusText });
         }
-    } catch (error) {
+    } catch(error) {
         console.error(error);
         res.status(500).json('Internal server error');
     }

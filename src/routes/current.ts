@@ -1,5 +1,6 @@
 import express from 'express';
 import { config } from "../config.js";
+import { CurrentSchema } from '../types.js';
 
 const WEATHER_URL = config.weatherData.weatherUrl;
 
@@ -11,26 +12,17 @@ if (!WEATHER_URL) {
 const router = express.Router();
 
 router.get('/current', async (req, res) => {
-    const lat = req.query.lat;
-    const lon = req.query.lon;
+    const result = CurrentSchema.safeParse(req.query);
 
-    if (!lat) {
-        return res.status(400).json({ message: 'Latitude parameter is required.' });
+    if (!result.success) {
+        return res.status(400).json({ errors: result.error.flatten().fieldErrors})
     }
 
-    if (!lon) {
-        return res.status(400).json({ message: 'Longitude parameter is required.' });
-    }
-
-    if (typeof lat !== 'string' || typeof lon !== 'string') {
-        return res.status(400).json({ message: 'Latitude and longitude must be strings.' });
-    }
-
-    const latitude = lat.trim();
-    const longitude = lon.trim();
+    const lat = result.data.lat;
+    const lon = result.data.lon;
 
     try {
-        const response = await fetch(`${WEATHER_URL}?latitude=${latitude}&longitude=${longitude}&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=Europe%2FBerlin&current=temperature_2m,weather_code,pressure_msl,relative_humidity_2m,is_day&hourly=temperature_2m,apparent_temperature,precipitation,relative_humidity_2m`);
+        const response = await fetch(`${WEATHER_URL}?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=Europe%2FBerlin&current=temperature_2m,weather_code,pressure_msl,relative_humidity_2m,is_day&hourly=temperature_2m,apparent_temperature,precipitation,relative_humidity_2m`);
 
         if (response.ok) {
             const data = await response.json();
